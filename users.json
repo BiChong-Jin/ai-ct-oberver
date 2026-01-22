@@ -1,0 +1,16 @@
+{
+  "users": [
+    {
+      "username": "admin",
+      "hashed_password": "$2b$12$GTj5SBIRqqpVsBmxwVRpfOfXFSf52N1x5e8PZns/nMFn0UMDSsuHe"
+    },
+    {
+      "username": "testuser",
+      "hashed_password": "$2b$12$fr6TTjU/CgYDb.z2/F777u0tpprlWc.j/27s.mqq1.8q2eW4tQjYq"
+    },
+    {
+      "username": "whoami",
+      "hashed_password": "$2b$12$Mur.9i5ztp1VZjNmgOeGj.xm5rNZ78trirTq4qe/ThJc2LT9f4Uoe"
+    }
+  ]
+}

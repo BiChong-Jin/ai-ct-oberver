@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CT Image Analyzer</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CT Image Analyzer</h1>
+            <div class="header-right">
+                <span id="user-info"></span>
+                <button id="logout-btn" class="btn btn-secondary">Logout</button>
+            </div>
+        </header>
+
+        <main>
+            <div class="upload-section">
+                <div id="drop-zone" class="drop-zone">
+                    <div class="drop-zone-content">
+                        <p class="drop-zone-icon">+</p>
+                        <p>Drag & drop a CT image here</p>
+                        <p class="small">or click to select a file</p>
+                        <p class="small">Supported formats: PNG, JPG, JPEG, GIF, WEBP (max 10MB)</p>
+                    </div>
+                    <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.gif,.webp" hidden>
+                </div>
+            </div>
+
+            <div id="preview-section" class="preview-section hidden">
+                <h3>Selected Image</h3>
+                <img id="image-preview" src="" alt="CT Image Preview">
+                <p id="file-name"></p>
+                <button id="analyze-btn" class="btn btn-primary">Analyze Image</button>
+            </div>
+
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Analyzing image...</p>
+            </div>
+
+            <div id="results-section" class="results-section hidden">
+                <h2>Analysis Results</h2>
+                <div id="analysis-content" class="analysis-content"></div>
+                <div class="disclaimer-box">
+                    <strong>Disclaimer:</strong>
+                    <p id="disclaimer-text"></p>
+                </div>
+                <button id="new-analysis-btn" class="btn btn-secondary">Analyze Another Image</button>
+            </div>
+        </main>
+
+        <footer>
+            <p class="disclaimer">
+                <strong>Important:</strong> This tool is for educational/research purposes only.
+                It should NOT be used for actual medical diagnosis.
+                Always consult qualified medical professionals.
+            </p>
+        </footer>
+    </div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        initApp();
+    </script>
+</body>
+</html>
