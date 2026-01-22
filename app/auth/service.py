@@ -1,11 +1,12 @@
-import json
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import bcrypt
 from jose import JWTError, jwt
+from sqlalchemy.orm import Session
 
-from app.config import JWT_SECRET_KEY, JWT_ALGORITHM, JWT_EXPIRY_MINUTES, USERS_FILE
+from app.config import JWT_SECRET_KEY, JWT_ALGORITHM, JWT_EXPIRY_MINUTES
+from app.models import User
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -16,49 +17,37 @@ def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
 
-def load_users() -> dict:
-    try:
-        with open(USERS_FILE, "r") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {"users": []}
+def get_user(db: Session, username: str) -> Optional[User]:
+    return db.query(User).filter(User.username == username).first()
 
 
-def save_users(data: dict) -> None:
-    with open(USERS_FILE, "w") as f:
-        json.dump(data, f, indent=2)
+def get_user_by_id(db: Session, user_id: int) -> Optional[User]:
+    return db.query(User).filter(User.id == user_id).first()
 
 
-def get_user(username: str) -> Optional[dict]:
-    data = load_users()
-    for user in data.get("users", []):
-        if user["username"] == username:
-            return user
-    return None
-
-
-def create_user(username: str, password: str) -> tuple[bool, str]:
+def create_user(db: Session, username: str, password: str) -> tuple[bool, str]:
     if len(username) < 3:
         return False, "Username must be at least 3 characters"
     if len(password) < 6:
         return False, "Password must be at least 6 characters"
-    if get_user(username):
+    if get_user(db, username):
         return False, "Username already exists"
 
-    data = load_users()
-    data["users"].append({
-        "username": username,
-        "hashed_password": hash_password(password)
-    })
-    save_users(data)
+    user = User(
+        username=username,
+        hashed_password=hash_password(password)
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
     return True, "User created successfully"
 
 
-def authenticate_user(username: str, password: str) -> Optional[dict]:
-    user = get_user(username)
+def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
+    user = get_user(db, username)
     if not user:
         return None
-    if not verify_password(password, user["hashed_password"]):
+    if not verify_password(password, user.hashed_password):
         return None
     return user
 

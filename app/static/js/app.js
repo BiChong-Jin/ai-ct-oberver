@@ -18,7 +18,6 @@ async function login(username, password) {
         formData.append('username', username);
         formData.append('password', password);
 
-        console.log('Attempting login for:', username);
         const response = await fetch('/api/auth/login', {
             method: 'POST',
             headers: {
@@ -27,15 +26,11 @@ async function login(username, password) {
             body: formData,
         });
 
-        console.log('Response status:', response.status);
         if (response.ok) {
             const data = await response.json();
-            console.log('Login successful, token received');
             setToken(data.access_token);
             return true;
         }
-        const errorData = await response.text();
-        console.error('Login failed:', response.status, errorData);
         return false;
     } catch (error) {
         console.error('Login error:', error);
@@ -118,6 +113,14 @@ async function analyzeImage(file) {
     throw new Error('Request failed');
 }
 
+async function getHistory() {
+    const response = await fetchWithAuth('/api/history');
+    if (response && response.ok) {
+        return await response.json();
+    }
+    return [];
+}
+
 let selectedFile = null;
 
 function initApp() {
@@ -129,6 +132,7 @@ function initApp() {
 
     loadUserInfo();
     setupEventListeners();
+    setupTabs();
 }
 
 async function loadUserInfo() {
@@ -136,6 +140,96 @@ async function loadUserInfo() {
     if (user) {
         document.getElementById('user-info').textContent = `Welcome, ${user.username}`;
     }
+}
+
+function setupTabs() {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.dataset.tab;
+            switchTab(tabName);
+        });
+    });
+}
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    document.getElementById(`${tabName}-tab`).classList.add('active');
+
+    if (tabName === 'history') {
+        loadHistory();
+    }
+}
+
+async function loadHistory() {
+    const historyList = document.getElementById('history-list');
+    const historyLoading = document.getElementById('history-loading');
+    const historyEmpty = document.getElementById('history-empty');
+
+    historyList.innerHTML = '';
+    historyLoading.classList.remove('hidden');
+    historyEmpty.classList.add('hidden');
+
+    try {
+        const history = await getHistory();
+
+        historyLoading.classList.add('hidden');
+
+        if (history.length === 0) {
+            historyEmpty.classList.remove('hidden');
+            return;
+        }
+
+        history.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.innerHTML = `
+                <div class="history-item-header">
+                    <span class="history-item-filename">${escapeHtml(item.filename)}</span>
+                    <span class="history-item-date">${formatDate(item.created_at)}</span>
+                </div>
+                <div class="history-item-preview">${escapeHtml(item.analysis.substring(0, 150))}...</div>
+            `;
+            div.addEventListener('click', () => showHistoryDetail(item));
+            historyList.appendChild(div);
+        });
+    } catch (error) {
+        historyLoading.classList.add('hidden');
+        historyList.innerHTML = '<p class="error-message">Failed to load history</p>';
+    }
+}
+
+function showHistoryDetail(item) {
+    const historyList = document.getElementById('history-list');
+    const historyEmpty = document.getElementById('history-empty');
+
+    historyEmpty.classList.add('hidden');
+    historyList.innerHTML = `
+        <button class="btn btn-secondary back-btn" onclick="loadHistory()">Back to History</button>
+        <div class="history-detail">
+            <h3>${escapeHtml(item.filename)}</h3>
+            <p class="date">${formatDate(item.created_at)}</p>
+            <div class="analysis">${escapeHtml(item.analysis)}</div>
+        </div>
+    `;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleString();
 }
 
 function setupEventListeners() {

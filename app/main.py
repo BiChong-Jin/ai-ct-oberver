@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
@@ -6,8 +8,16 @@ import os
 
 from app.auth.router import router as auth_router
 from app.analysis.router import router as analysis_router
+from app.database import init_db
 
-app = FastAPI(title="CT Image Analyzer", version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
+
+app = FastAPI(title="CT Image Analyzer", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

@@ -17,38 +17,56 @@
         </header>
 
         <main>
-            <div class="upload-section">
-                <div id="drop-zone" class="drop-zone">
-                    <div class="drop-zone-content">
-                        <p class="drop-zone-icon">+</p>
-                        <p>Drag & drop a CT image here</p>
-                        <p class="small">or click to select a file</p>
-                        <p class="small">Supported formats: PNG, JPG, JPEG, GIF, WEBP (max 10MB)</p>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="upload">New Analysis</button>
+                <button class="tab-btn" data-tab="history">History</button>
+            </div>
+
+            <div id="upload-tab" class="tab-content active">
+                <div class="upload-section">
+                    <div id="drop-zone" class="drop-zone">
+                        <div class="drop-zone-content">
+                            <p class="drop-zone-icon">+</p>
+                            <p>Drag & drop a CT image here</p>
+                            <p class="small">or click to select a file</p>
+                            <p class="small">Supported formats: PNG, JPG, JPEG, GIF, WEBP (max 10MB)</p>
+                        </div>
+                        <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.gif,.webp" hidden>
                     </div>
-                    <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.gif,.webp" hidden>
+                </div>
+
+                <div id="preview-section" class="preview-section hidden">
+                    <h3>Selected Image</h3>
+                    <img id="image-preview" src="" alt="CT Image Preview">
+                    <p id="file-name"></p>
+                    <button id="analyze-btn" class="btn btn-primary">Analyze Image</button>
+                </div>
+
+                <div id="loading" class="loading hidden">
+                    <div class="spinner"></div>
+                    <p>Analyzing image...</p>
+                </div>
+
+                <div id="results-section" class="results-section hidden">
+                    <h2>Analysis Results</h2>
+                    <div id="analysis-content" class="analysis-content"></div>
+                    <div class="disclaimer-box">
+                        <strong>Disclaimer:</strong>
+                        <p id="disclaimer-text"></p>
+                    </div>
+                    <button id="new-analysis-btn" class="btn btn-secondary">Analyze Another Image</button>
                 </div>
             </div>
 
-            <div id="preview-section" class="preview-section hidden">
-                <h3>Selected Image</h3>
-                <img id="image-preview" src="" alt="CT Image Preview">
-                <p id="file-name"></p>
-                <button id="analyze-btn" class="btn btn-primary">Analyze Image</button>
-            </div>
-
-            <div id="loading" class="loading hidden">
-                <div class="spinner"></div>
-                <p>Analyzing image...</p>
-            </div>
-
-            <div id="results-section" class="results-section hidden">
-                <h2>Analysis Results</h2>
-                <div id="analysis-content" class="analysis-content"></div>
-                <div class="disclaimer-box">
-                    <strong>Disclaimer:</strong>
-                    <p id="disclaimer-text"></p>
+            <div id="history-tab" class="tab-content">
+                <div id="history-loading" class="loading hidden">
+                    <div class="spinner"></div>
+                    <p>Loading history...</p>
                 </div>
-                <button id="new-analysis-btn" class="btn btn-secondary">Analyze Another Image</button>
+                <div id="history-empty" class="empty-state hidden">
+                    <p>No analysis history yet.</p>
+                </div>
+                <div id="history-list" class="history-list"></div>
             </div>
         </main>
 
